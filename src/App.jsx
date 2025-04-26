@@ -1,22 +1,34 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./App.css";
 import { Options } from "./Options/Options";
 import { Feedback } from "./Feedback/Feedback";
+import { Notification } from "./Notification/Notification";
 
-function App() {
-  const [feedbacks, setFeedbacks] = useState({
-    good: 0,
-    neutral: 0,
-    bad: 0,
+export function App() {
+  const [feedbacks, setFeedbacks] = useState(() => {
+    const feedbacks = JSON.parse(localStorage.getItem("feedbacks"));
+    if (feedbacks !== null) {
+      return feedbacks;
+    }
+    return { good: 0, neutral: 0, bad: 0 };
   });
 
   function updateFeedback(feedbackType) {
     setFeedbacks({ ...feedbacks, [feedbackType]: feedbacks[feedbackType] + 1 });
   }
 
-  //   function handleReset() {
-  //     setFeedbacks({ good: 0, neutral: 0, bad: 0 });
-  //   }
+  function resetFeedback() {
+    setFeedbacks({ good: 0, neutral: 0, bad: 0 });
+  }
+
+  useEffect(() => {
+    localStorage.setItem("feedbacks", JSON.stringify(feedbacks));
+  }, [feedbacks]);
+
+  const totalFeedback = Object.values(feedbacks).reduce(
+    (result, item) => result + item,
+    0
+  );
 
   return (
     <>
@@ -25,8 +37,19 @@ function App() {
         Please leave your feedback about our service by selecting one of the
         options below.
       </p>
-      <Options feedbacks={feedbacks} updateFeedback={updateFeedback}></Options>
-      <Feedback feedbacks={feedbacks}></Feedback>
+      <Options
+        totalFeedback={totalFeedback}
+        updateFeedback={updateFeedback}
+        resetFeedback={resetFeedback}
+      ></Options>
+      {totalFeedback > 0 ? (
+        <Feedback
+          feedbacks={feedbacks}
+          totalFeedback={totalFeedback}
+        ></Feedback>
+      ) : (
+        <Notification />
+      )}
     </>
   );
 }
