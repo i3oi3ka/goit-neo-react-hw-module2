@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import "./App.css";
-import { Options } from "./components/Options/Options";
-import { Feedback } from "./components/Feedback/Feedback";
-import { Notification } from "./components/Notification/Notification";
+import Options from "./components/Options/Options";
+import Feedback from "./components/Feedback/Feedback";
+import Notification from "./components/Notification/Notification";
+import Description from "./components/Description/Description";
 
-export function App() {
+function App() {
   const [feedbacks, setFeedbacks] = useState(() => {
     const feedbacks = JSON.parse(localStorage.getItem("feedbacks"));
     if (feedbacks !== null) {
@@ -30,13 +31,11 @@ export function App() {
     0
   );
 
+  const positiveFeedback = Math.round((feedbacks.good / totalFeedback) * 100);
+
   return (
     <section>
-      <h1>Sip Happens Café</h1>
-      <p>
-        Please leave your feedback about our service by selecting one of the
-        options below.
-      </p>
+      <Description />
       <Options
         totalFeedback={totalFeedback}
         updateFeedback={updateFeedback}
@@ -46,6 +45,7 @@ export function App() {
         <Feedback
           feedbacks={feedbacks}
           totalFeedback={totalFeedback}
+          positiveFeedback={positiveFeedback}
         ></Feedback>
       ) : (
         <Notification />
